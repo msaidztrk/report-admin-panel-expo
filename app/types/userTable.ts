@@ -1,5 +1,5 @@
 // src/types/userTable.ts
-export interface UserTableType {
+interface UserTableType {
     id: number;
     user: {
       mail: string;
@@ -7,3 +7,6 @@ export interface UserTableType {
     created_at: string;
     balance: string;
   }
+
+
+export default UserTableType;

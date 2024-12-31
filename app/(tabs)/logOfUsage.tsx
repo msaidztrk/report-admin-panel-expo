@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const AboutScreen = () => {
+const LogOfUsageScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>About</Text>
+      <Text style={styles.title}>Log of Usage</Text>
+      {/* Add your log of usage content here */}
     </View>
   );
 };
@@ -22,4 +23,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AboutScreen;
+export default LogOfUsageScreen;

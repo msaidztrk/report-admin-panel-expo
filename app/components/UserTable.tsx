@@ -1,22 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, Pressable, ScrollView, Dimensions } from 'react-native';
+import { View, Text, FlatList, Pressable, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import axiosInstance from '../api/axiosConfig';
-import { UserTableType } from '../types/userTable';
-import { ActivityIndicator } from 'react-native';
-
-
-
-
+import UserTableType from '../types/userTable';
+import { Button } from 'react-native';
 
 export default function UserTable() {
-    const datas = [
-        { id: '1', name: 'John Doe', joinDate: '2024-01-15', balance: '$1,250' },
-        { id: '2', name: 'Jane Smith', joinDate: '2024-02-01', balance: '$2,840' },
-        { id: '3', name: 'Robert Johnson', joinDate: '2024-02-15', balance: '$950' },
-        { id: '4', name: 'Emily Brown', joinDate: '2024-03-01', balance: '$3,420' },
-    ];
-
-
     const [users, setUsers] = useState<UserTableType[]>([]); // Explicitly define the type
     const [page, setPage] = useState(1); // Current page
     const [loading, setLoading] = useState(false); // Loading state
@@ -27,23 +15,29 @@ export default function UserTable() {
         setLoading(true);
 
         try {
+            let newUsers: any = null;
+            while (!newUsers) {
+                const response = await axiosInstance.post<{
+                    data: UserTableType[];
+                    current_page: number;
+                    per_page: number;
+                    total: number;
+                }>('/user-manage', {
+                    page,
+                    per_page: 10,
+                });
 
-            const response = await axiosInstance.post<{
-                data: UserTableType[];
-                current_page: number;
-                per_page: number;
-                total: number;
-            }>('/user-manage', {
-                page, // Current page
-                per_page: 10, // Number of items per page
-            });
+                console.log('API Response:', response.data); // Log the entire response
 
-            const newUsers = response.data.data; // Assuming the API returns { data: [...] }
-            if (newUsers.length > 0) {
-                setUsers((prevUsers) => [...prevUsers, ...newUsers]); // Append new data
-                setPage((prevPage) => prevPage + 1); // Increment page
-            } else {
-                setHasMore(false); // No more data to load
+                newUsers = response.data.data;
+
+                if (newUsers && newUsers.length > 0) {
+                    setUsers((prevUsers) => [...prevUsers, ...newUsers]); // Append new data
+                    setPage((prevPage) => prevPage + 1); // Increment page
+                } else {
+                    setHasMore(false); // No more data to load
+                    break; // Exit the loop if no more data is available
+                }
             }
 
         } catch (error) {
@@ -52,55 +46,53 @@ export default function UserTable() {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         fetchUsers();
     }, []);
-    const handleLoadMore = () => {
-        if (hasMore && !loading) {
-            fetchUsers();
-        }
-    };
-
-    const renderFooter = () => {
-        if (!loading) return null;
-        return <ActivityIndicator size="small" color="#3b82f6" style={{ padding: 10 }} />;
-    };
-
 
     const windowWidth = Dimensions.get('window').width;
     const scrollViewRef = useRef(null);
 
+    // Define column widths
+    const columnWidths = {
+        user: windowWidth * 0.25,
+        joinDate: windowWidth * 0.25,
+        balance: windowWidth * 0.2,
+        action: windowWidth * 0.3,
+    };
+
+    // Total table width
+    const tableWidth = Object.values(columnWidths).reduce((sum, width) => sum + width, 0);
+
     const TableHeader = () => (
-        <View style={{ flexDirection: 'row', backgroundColor: '#f9fafb', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' }}>
-            <Text style={{ width: windowWidth * 0.25, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>User</Text>
-            <Text style={{ width: windowWidth * 0.25, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Join Date</Text>
-            <Text style={{ width: windowWidth * 0.2, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Balance</Text>
-            <Text style={{ width: windowWidth * 0.3, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Action</Text>
+        <View style={{ flexDirection: 'row', backgroundColor: '#f9fafb', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e5e7eb', width: tableWidth }}>
+            <Text style={{ width: columnWidths.user, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>User</Text>
+            <Text style={{ width: columnWidths.joinDate, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Join Date</Text>
+            <Text style={{ width: columnWidths.balance, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Balance</Text>
+            <Text style={{ width: columnWidths.action, fontWeight: '600', color: '#374151', paddingHorizontal: 8 }}>Action</Text>
         </View>
     );
 
     const renderItem = ({ item }: any) => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e5e7eb', backgroundColor: '#ffffff' }}>
-            <Text style={{ width: windowWidth * 0.25, fontSize: 14, color: '#111827', paddingHorizontal: 8 }} numberOfLines={1}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e5e7eb', backgroundColor: '#ffffff', width: tableWidth }}>
+            <Text style={{ width: columnWidths.user, fontSize: 14, color: '#111827', paddingHorizontal: 8 }} numberOfLines={1}>
                 {item.name}
             </Text>
-            <Text style={{ width: windowWidth * 0.25, fontSize: 14, color: '#111827', paddingHorizontal: 8 }}>
+            <Text style={{ width: columnWidths.joinDate, fontSize: 14, color: '#111827', paddingHorizontal: 8 }}>
                 {item.joinDate}
             </Text>
-            <Text style={{ width: windowWidth * 0.2, fontSize: 14, color: '#111827', paddingHorizontal: 8 }}>
+            <Text style={{ width: columnWidths.balance, fontSize: 14, color: '#111827', paddingHorizontal: 8 }}>
                 {item.balance}
             </Text>
-            <View style={{ width: windowWidth * 0.3, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 8, gap: 8 }}>
-                <Pressable
-                    style={({ pressed }) => ({
-                        backgroundColor: pressed ? '#2563eb' : '#3b82f6',
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 6,
-                    })}
-                    onPress={() => console.log('View details:', item.id)}
-                >
-                    <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '500' }}>View</Text>
+            <View style={{ width: columnWidths.action, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 8, gap: 8 }}>
+                <Pressable>
+                    <Button
+                        onPress={() => console.log('View details:', item.id)}
+                        title="Learn More"
+                        color="#841584"
+                        accessibilityLabel="Learn more about this purple button"
+                    />
                 </Pressable>
                 <Pressable
                     style={({ pressed }) => ({
@@ -127,14 +119,14 @@ export default function UserTable() {
                 ref={scrollViewRef}
                 showsHorizontalScrollIndicator={false}
             >
-                <View>
+                <View style={{ width: tableWidth }}>
                     {/* Table Header */}
                     <TableHeader />
                     {/* Table Body */}
                     <FlatList
                         data={users}
                         renderItem={renderItem}
-                        keyExtractor={(item : any) => item.id}
+                        keyExtractor={(item: any) => item.id}
                         scrollEnabled={false} // Disable FlatList scroll since ScrollView is handling it
                     />
                 </View>

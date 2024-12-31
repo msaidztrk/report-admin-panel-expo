@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { login as loginApi, logout as logoutApi } from '../api/auth';
 import useAuthStore from '../store/authStore';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const useAuth = () => {
   const { setToken, setUser, clearAuth } = useAuthStore();
@@ -14,10 +15,10 @@ const useAuth = () => {
       const { token, user } = await loginApi(email, password);
       setToken(token);
       setUser(user);
-      localStorage.setItem('token', token); // Save token to localStorage
+      await AsyncStorage.setItem('token', token);
     } catch (err : any) {
       setError(err.message || 'Login failed');
-      throw err;
+    //   throw err;
     } finally {
       setLoading(false);
     }
@@ -29,7 +30,7 @@ const useAuth = () => {
     try {
       await logoutApi();
       clearAuth();
-      localStorage.removeItem('token'); // Remove token from localStorage
+      await AsyncStorage.removeItem('token'); // Remove token from AsyncStorage
     } catch (err : any) {
       setError(err.message || 'Logout failed');
       throw err;

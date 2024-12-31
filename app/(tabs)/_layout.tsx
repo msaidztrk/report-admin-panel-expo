@@ -1,21 +1,47 @@
-import { Tabs } from "expo-router";
+import { Tabs } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#ffd33d',
+        headerStyle: {
+          backgroundColor: '#25292e',
+        },
+        headerShadowVisible: false,
+        headerShown: false, 
+        headerTintColor: '#fff',
+        tabBarStyle: {
+          backgroundColor: '#25292e',
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          tabBarLabel: "Home", // Label for the tab bar
-          headerShown: false, // Hide the header for this screen
+        //   title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
+          ),
         }}
       />
       <Tabs.Screen
         name="about"
         options={{
-          tabBarLabel: "About", // Label for the tab bar
-          headerShown: false, // Hide the header for this screen
+        //   title: 'About',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+          ),
         }}
+      />
+      <Tabs.Screen
+        name="logOfUsage"
+        options={{
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'list' : 'list-outline'} color={color} size={24}/>
+            ),
+          }}
       />
     </Tabs>
   );

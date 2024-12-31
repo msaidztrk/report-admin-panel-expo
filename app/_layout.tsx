@@ -1,22 +1,18 @@
 import React, { useEffect } from "react";
 import { router, Slot } from "expo-router";
 import useAuthStore from './store/authStore';
-// import { AuthProvider } from "../AuthContext";
 import "../global.css";
-import { createDrawerNavigator } from '@react-navigation/drawer'; 
-import { NavigationContainer } from '@react-navigation/native'; 
+import { Drawer } from "expo-router/drawer";
 import Sidebar from "./components/Sidebar";
-import CustomHeader from "./components/CustomHeader ";
-import Toast from "react-native-toast-message"; 
 
-const Drawer = createDrawerNavigator();
-import useTokenCheck from '../app/hooks/useTokenCheck';  
+import Toast from "react-native-toast-message";
+import useTokenCheck from '../app/hooks/useTokenCheck';
+import CustomHeader from "./components/CustomHeader ";
 
 export default function RootLayout() {
-
-  const isAuthenticated = useAuthStore((state: { isAuthenticated: any; }) => state.isAuthenticated);
-  useTokenCheck();  
-  console.log('page rerenderd');
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  useTokenCheck();
+  console.log('page rerendered');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -24,32 +20,33 @@ export default function RootLayout() {
     } else {
       router.replace("/(tabs)");
     }
-  }, [isAuthenticated]); 
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
       <>
-       <Toast />
+        <Toast />
         <Slot />
-       
       </>
     );
-  } 
+  }
+
+  return ( 
 
 
-  return (
-
-
-    <Drawer.Navigator drawerContent={(props) => <Sidebar {...props} />}>
-    <Drawer.Screen
-      name="Main"
-      component={Slot}
-      options={{
-        // headerShown: true,
-        header: () => <CustomHeader />, // Use the custom header
+    
+    <Drawer
+      drawerContent={(props) => <Sidebar {...props} />}
+      screenOptions={{
+        header: () => <CustomHeader />,
       }}
-    />
-  </Drawer.Navigator>
-  
+    >
+      <Drawer.Screen
+        name="(tabs)" // This matches the `(tabs)` directory
+        options={{
+          // title: "Home",
+        }}
+      />
+    </Drawer>
   );
 }
