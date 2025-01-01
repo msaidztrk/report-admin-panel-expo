@@ -33,7 +33,7 @@ const useTokenCheck = () => {
       if (decodedToken.exp < currentTime) {
         // Token has expired, clear authentication
         console.log('Token expired, clearing authentication');
-        clearAuth();
+        // clearAuth();
       }
     }
   };

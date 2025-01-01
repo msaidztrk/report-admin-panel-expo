@@ -10,7 +10,7 @@ export default function TabLayout() {
           backgroundColor: '#25292e',
         },
         headerShadowVisible: false,
-        headerShown: false, 
+        headerShown: false,
         headerTintColor: '#fff',
         tabBarStyle: {
           backgroundColor: '#25292e',
@@ -20,7 +20,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-        //   title: 'Home',
+          //   title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
           ),
@@ -29,20 +29,31 @@ export default function TabLayout() {
       <Tabs.Screen
         name="about"
         options={{
-        //   title: 'About',
+          //   title: 'About',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+            <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24} />
           ),
         }}
       />
       <Tabs.Screen
         name="logOfUsage"
         options={{
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'list' : 'list-outline'} color={color} size={24}/>
-            ),
-          }}
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'list' : 'list-outline'} color={color} size={24} />
+          ),
+        }}
       />
+
+      <Tabs.Screen
+        name="userAddOrUpdate"
+        options={{
+          href: null,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'list' : 'list-outline'} color={color} size={24} />
+          ),
+        }}
+      />
+
     </Tabs>
   );
 }

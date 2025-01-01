@@ -16,6 +16,7 @@ const useAuth = () => {
       setToken(token);
       setUser(user);
       await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user)); // Save user data
     } catch (err : any) {
       setError(err.message || 'Login failed');
     //   throw err;
@@ -31,6 +32,7 @@ const useAuth = () => {
       await logoutApi();
       clearAuth();
       await AsyncStorage.removeItem('token'); // Remove token from AsyncStorage
+      await AsyncStorage.removeItem('user'); 
     } catch (err : any) {
       setError(err.message || 'Logout failed');
       throw err;
