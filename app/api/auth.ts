@@ -20,6 +20,7 @@ export const login = async (email: string, password: string): Promise<LoginRespo
       if (response.data.token && response.data.user) {
         return response.data;
       } else {
+        console.log(response.data);
         throw new Error('Invalid response from server');
       }
     } catch (error: any) {
