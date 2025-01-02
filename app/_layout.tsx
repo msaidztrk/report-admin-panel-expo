@@ -64,7 +64,7 @@ export default function RootLayout() {
 
   return (
 
-
+    <>
 
     <Drawer
       drawerContent={(props) => <Sidebar {...props} />}
@@ -79,5 +79,7 @@ export default function RootLayout() {
         }}
       />
     </Drawer>
+    <Toast />
+    </>
   );
 }
