@@ -3,6 +3,10 @@ import { View, Text, FlatList, Pressable, ScrollView, Dimensions, ActivityIndica
 import axiosInstance from '../api/axiosConfig';
 import UserTableType from '../types/userTable';
 import { Button } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { Link } from 'expo-router';
+import { Routes } from '../types/routes';
 
 export default function UserTable() {
     const [users, setUsers] = useState<UserTableType[]>([]); // Explicitly define the type
@@ -10,34 +14,41 @@ export default function UserTable() {
     const [loading, setLoading] = useState(false); // Loading state
     const [hasMore, setHasMore] = useState(true); // Whether more data is available
 
+    // Reset state when component mounts
+    useEffect(() => {
+        setUsers([]); // Clear the users list
+        setPage(1); // Reset the page to 1
+        setHasMore(true); // Reset the hasMore flag
+        fetchUsers(); // Fetch fresh data
+    }, []); // Empty dependency array ensures this runs only on mount
+
     const fetchUsers = async () => {
         if (loading || !hasMore) return; // Prevent multiple requests
         setLoading(true);
 
         try {
             let newUsers: any = null;
-            while (!newUsers) {
-                const response = await axiosInstance.post<{
-                    data: UserTableType[];
-                    current_page: number;
-                    per_page: number;
-                    total: number;
-                }>('/user-manage', {
-                    page,
-                    per_page: 10,
-                });
 
-                console.log('API Response:', response.data); // Log the entire response
+            const response = await axiosInstance.post<{
+                data: UserTableType[];
+                current_page: number;
+                per_page: number;
+                total: number;
+            }>('/user-manage', {
+                page,
+                per_page: 10,
+            });
 
-                newUsers = response.data.data;
+            console.log('API Response:', response.data); // Log the entire response
 
-                if (newUsers && newUsers.length > 0) {
-                    setUsers((prevUsers) => [...prevUsers, ...newUsers]); // Append new data
-                    setPage((prevPage) => prevPage + 1); // Increment page
-                } else {
-                    setHasMore(false); // No more data to load
-                    break; // Exit the loop if no more data is available
-                }
+            newUsers = response.data.data;
+
+            if (newUsers && newUsers.length > 0) {
+                setUsers((prevUsers) => [...prevUsers, ...newUsers]); // Append new data
+                setPage((prevPage) => prevPage + 1); // Increment page
+            } else {
+                setHasMore(false); // No more data to load
+             
             }
 
         } catch (error) {
@@ -46,7 +57,6 @@ export default function UserTable() {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -87,13 +97,15 @@ export default function UserTable() {
             </Text>
             <View style={{ width: columnWidths.action, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 8, gap: 8 }}>
                 <Pressable>
-                    <Button
-                        onPress={() => console.log('View details:', item.id)}
-                        title="Learn More"
-                        color="#841584"
-                        accessibilityLabel="Learn more about this purple button"
-                    />
+                    <Link
+                        href={`${Routes.USER_ADD_OR_UPDATE}${item.id}`}
+                        asChild>
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <FontAwesome6 name="pen-to-square" size={24} color="#841584" />
+                        </Pressable>
+                    </Link>
                 </Pressable>
+
                 <Pressable
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? '#dc2626' : '#ef4444',
@@ -111,7 +123,7 @@ export default function UserTable() {
 
     return (
         <View style={{ flex: 1, backgroundColor: '#ffffff', borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}>
-            
+
             <ScrollView
                 horizontal={true}
                 ref={scrollViewRef}

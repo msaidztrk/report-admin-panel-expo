@@ -1,21 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { createNewUser } from "../api/userManage";
+import { createNewUser, fetchUserData, updateUserData } from "../api/userManage";
+import { useLocalSearchParams } from 'expo-router';
 
 export default function UserAddOrUpdate() {
   const [loginName, setLoginName] = useState<string>("");
   const [dcName, setDcName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const handleSubmit = () => {
+  const { id } = useLocalSearchParams();
+  console.log("id", id);
+
+  const handleNewUser = () => {
     console.log("Submitted:", { loginName, dcName, password });
-    createNewUser(dcName , loginName   , password)
+    createNewUser(dcName, loginName, password)
   };
+
+
+  const handleUpdateUser = () => {
+    updateUserData(id, dcName, loginName, password)
+  }
+
+
+
+
+
+
+  useEffect(() => {
+
+    setLoginName("");
+    setDcName("");
+    setPassword("");
+    // Define an async function inside useEffect
+    const fetchData = async () => {
+      if (id === undefined) {
+        console.log("id is undefined");
+        return;
+      }
+
+      try {
+        const userData: any = await fetchUserData(id);
+        console.log("userData:", userData);
+        setLoginName(userData.email)
+        setDcName(userData.discord_name);
+        setPassword(userData.password_unhashed)
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    // Call the async function
+    fetchData();
+  }, [id]);
 
   return (
     <View className="flex-1 p-6 bg-gray-100">
       <Text className="text-2xl font-bold text-center text-gray-800 mb-6">
-        Kullanıcı Ekle
+        {id ? "Kullanıcı Güncelle" : "Kullanıcı Ekle"}
       </Text>
 
       {/* Login Name Input */}
@@ -50,7 +91,6 @@ export default function UserAddOrUpdate() {
           placeholder="Enter Password"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
           placeholderTextColor="#999"
         />
       </View>
@@ -58,7 +98,7 @@ export default function UserAddOrUpdate() {
       {/* Submit Button */}
       <TouchableOpacity
         className="bg-blue-500 rounded-lg py-3 mt-4"
-        onPress={handleSubmit}
+        onPress={id ? handleUpdateUser : handleNewUser}
       >
         <Text className="text-lg font-bold text-white text-center">Submit</Text>
       </TouchableOpacity>
