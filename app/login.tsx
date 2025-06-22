@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Animated, Easing, Dimensions, ScrollView, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // For icons
 import useAuth from '../app/hooks/useAuth';
+import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,11 +24,18 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      console.log('Login button pressed');
       await login(email, password);
-      // Redirect to the main screen or handle navigation
+      // router.replace('/screens');
     } catch (err) {
       console.error('Login failed:', err);
     }
+  };
+
+  const handleBypassLogin = () => {
+    // Simulating a successful login with test credentials
+    login('test@example.com', 'password123');
+    router.replace('/screens');
   };
 
   return (
@@ -73,6 +81,16 @@ const Login = () => {
           >
             <Text className="text-white text-lg font-bold">
               {loading ? 'Loading...' : 'Login'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="bg-orange-500 rounded-lg py-3 items-center mt-4"
+            onPress={handleBypassLogin}
+            disabled={loading}
+          >
+            <Text className="text-white text-lg font-bold">
+              Bypass Login (Development Only)
             </Text>
           </TouchableOpacity>
 

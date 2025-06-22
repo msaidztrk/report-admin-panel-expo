@@ -7,6 +7,7 @@ import Sidebar from "./components/Sidebar";
 
 import Toast from "react-native-toast-message";
 import useTokenCheck from '../app/hooks/useTokenCheck';
+import useServerHealth from './hooks/useServerHealth';
 import CustomHeader from "./components/CustomHeader ";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -17,6 +18,7 @@ export default function RootLayout() {
   const { setToken, setUser } = useAuthStore();
 
   useTokenCheck();
+  useServerHealth(); // Check server health on app startup
   console.log('page rerendered');
 
   const pathname = usePathname(); // Get the current pathname

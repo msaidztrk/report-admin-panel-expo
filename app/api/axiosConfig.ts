@@ -1,9 +1,10 @@
 import axios from "axios";
 import useAuthStore from "../store/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+  // baseURL: "http://bcrain.site/api/mobile", 
 const axiosInstance = axios.create({
-  baseURL: "http://bcrain.site/api/mobile", // Replace with your backend URL
+
+  baseURL : "http://192.168.1.3:8000/api/mobile",
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,12 +14,18 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     try {
-      const token = await AsyncStorage.getItem("token"); // Or use your state management
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      } else {
-        console.log("no token found");
-      }
+      const fullURL = `${config.baseURL}${config.url}${config.params ? '?' + new URLSearchParams(config.params).toString() : ''}`;
+      console.log('Request URL:', fullURL); 
+      
+      // const token = await AsyncStorage.getItem("token"); // Or use your state management
+      // if (token) {
+      //   config.headers.Authorization = `Bearer ${token}`;
+      // } else {
+      //   console.log("no token found");
+      // }
+
+      // Log the full URL including baseURL and any query parameters
+     
     } catch (error) {
       console.error("Error retrieving token from AsyncStorage:", error);
     }

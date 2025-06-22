@@ -18,7 +18,7 @@ const useAuth = () => {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('user', JSON.stringify(user)); // Save user data
     } catch (err : any) {
-      setError(err.message || 'Login failed');
+      setError(err.message + ' : Login failed');
     //   throw err;
     } finally {
       setLoading(false);
